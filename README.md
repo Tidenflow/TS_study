@@ -1,6 +1,14 @@
 # TS_study
 Recording My TypeScript Learning Journey
 
+根据README，你的TypeScript学习分为5个阶段：
+1. 阶段一：基础类型 - 原始类型、数组与元组、枚举
+2. 阶段二：接口与高级对象 - 接口vs类型、函数重载、抽象类
+3. 阶段三：泛型魔法 - 泛型约束、泛型接口、keyof（核心）
+4. 阶段四：类型体操 - 条件类型、映射类型、模板字符串类型
+5. 阶段五：实战封装 - 封装axios、全局声明文件
+
+
 # Expected code organization
 ```text
 TS_study/
