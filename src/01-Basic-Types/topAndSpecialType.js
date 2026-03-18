@@ -1,6 +1,7 @@
+"use strict";
 //  any 就是放弃类型检查
 console.log("===1.any 放弃类型检查===");
-var value = "hello";
+let value = "hello";
 //  value 可以重新赋值
 value = 123;
 console.log(value);
@@ -10,7 +11,7 @@ console.log(typeof (value)); //输出boolean
 console.log(value.length); //   编辑时不报错  输出undefined
 // value.toFixed();             //   编辑时不报错  运行报错  TypeError: value.toFixed is not a function
 console.log("===2.unknown 安全的顶级类型===");
-var value1 = "hello";
+let value1 = "hello";
 // console.log(value1.length);  //  编辑时会报错 “value1”的类型为“未知”。
 value1 = 123;
 console.log(value);
@@ -89,7 +90,7 @@ function test(value) {
 }
 console.log("===今日实验===");
 console.log("===unknown禁止直接访问===");
-var value2 = "Tom";
+let value2 = "Tom";
 console.log(typeof value2);
 // console.log(value2.length);  此时编辑器一定会报错
 // 但是我都知道这就是字符"Tom"我怎么访问length呢？？
