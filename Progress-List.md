@@ -45,3 +45,19 @@
 **文档**：`docs/260320-TS-Practice-Notes.md`
 
 ---
+
+## 2026-03-21
+
+### 03-Class-generic
+
+| 文件 | 内容 |
+|------|------|
+| `class.ts` | 类基础：`public` / `private` / `readonly` / `static`、构造函数、实例方法 |
+| `class-inheritance.ts` | 类继承：`extends`、`super`、方法重写 |
+| `abstract-class.ts` | 抽象类：抽象属性/方法、子类实现、多态 |
+| `generic-function.ts` | 泛型函数：基础泛型、`keyof` 约束、多泛型参数 |
+| `generic-interface.ts` | 泛型接口：接口泛型化、固定类型实现与保留泛型实现 |
+
+**文档**：`docs/260321-TS-Notes.md`
+
+---
