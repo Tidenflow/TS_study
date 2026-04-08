@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Tidenflow/TS_study/issues"
   },
-  "homepage": "https://github.com/Tidenflow/TS_study#readme"
+  "homepage": "https://github.com/Tidenflow/TS_study#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }

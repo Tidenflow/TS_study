@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWT 学习前端</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 600px; margin: 0 auto; }
+    h1 { margin-bottom: 20px; color: #333; }
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .card h2 { margin-bottom: 12px; font-size: 18px; color: #555; }
+    input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    button.secondary { background: #6c757d; }
+    button.secondary:hover { background: #545b62; }
+    .error { color: #dc3545; margin-top: 10px; font-size: 14px; }
+    .success { color: #28a745; margin-top: 10px; font-size: 14px; }
+    pre { background: #f8f9fa; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 12px; margin-top: 10px; }
+    .hidden { display: none; }
+    .token-display { word-break: break-all; font-size: 11px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>JWT 学习演示</h1>
+
+    <!-- 登录卡片 -->
+    <div class="card">
+      <h2>1. 登录</h2>
+      <input type="text" id="username" placeholder="用户名 (admin / user)" value="admin">
+      <input type="password" id="password" placeholder="密码 (123456)" value="123456">
+      <button onclick="login()">登录</button>
+      <div id="loginMsg"></div>
+    </div>
+
+    <!-- Token 显示 -->
+    <div class="card hidden" id="tokenCard">
+      <h2>2. 当前 Token</h2>
+      <p class="token-display" id="tokenDisplay"></p>
+      <button class="secondary" onclick="logout()" style="margin-top: 10px;">登出</button>
+    </div>
+
+    <!-- 测试接口 -->
+    <div class="card">
+      <h2>3. 测试接口</h2>
+      <button onclick="getProfile()">获取用户资料</button>
+      <button onclick="getSecret()">获取私密数据</button>
+      <button class="secondary" onclick="getPublic()">获取公开数据</button>
+      <div id="apiMsg"></div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TODO: 前端 Token 管理 -->
+  <!-- ============================================ -->
+  <script>
+    const API_BASE = '/api'
+    let currentToken = null
+
+    // ============================================
+    // TODO: 保存 Token 到 localStorage
+    // ============================================
+    function saveToken(token) {
+      // 任务：使用 localStorage.setItem() 保存 token
+      // 参考答案：localStorage.setItem('token', token)
+      
+      // TODO: 请实现
+    }
+
+    // ============================================
+    // TODO: 从 localStorage 获取 Token
+    // ============================================
+    function getStoredToken() {
+      // 任务：使用 localStorage.getItem() 获取 token
+      // 参考答案：return localStorage.getItem('token')
+      
+      // TODO: 请实现
+      return null
+    }
+
+    // ============================================
+    // TODO: 清除 Token
+    // ============================================
+    function clearStoredToken() {
+      // 任务：使用 localStorage.removeItem() 清除 token
+      // 参考答案：localStorage.removeItem('token')
+      
+      // TODO: 请实现
+    }
+
+    // 登录
+    async function login() {
+      const username = document.getElementById('username').value
+      const password = document.getElementById('password').value
+      const msgEl = document.getElementById('loginMsg')
+
+      try {
+        // TODO: 发送登录请求（提示：POST /api/auth/login，body 为 { username, password }）
+        
+        // 参考答案：
+        // const res = await fetch(`${API_BASE}/auth/login`, {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ username, password })
+        // })
+        // const data = await res.json()
+        
+        // TODO: 请实现完整的登录逻辑
+        
+        msgEl.innerHTML = '<span class="error">TODO: 请先实现前端的 TODO 任务</span>'
+      } catch (err) {
+        msgEl.innerHTML = `<span class="error">错误: ${err.message}</span>`
+      }
+    }
+
+    // 登出
+    function logout() {
+      currentToken = null
+      clearStoredToken()
+      document.getElementById('tokenCard').classList.add('hidden')
+      document.getElementById('loginMsg').innerHTML = '<span class="success">已登出</span>'
+    }
+
+    // ============================================
+    // TODO: 发送带 Token 的请求
+    // ============================================
+    async function makeAuthRequest(url) {
+      const msgEl = document.getElementById('apiMsg')
+      
+      // 任务：
+      // 1. 从 localStorage 获取 token（调用 getStoredToken()）
+      // 2. 在请求头中添加 Authorization: Bearer <token>
+      // 3. 处理响应
+      
+      // 参考答案：
+      // const token = getStoredToken()
+      // if (!token) {
+      //   msgEl.innerHTML = '<span class="error">请先登录</span>'
+      //   return
+      // }
+      // const res = await fetch(url, {
+      //   headers: { 'Authorization': `Bearer ${token}` }
+      // })
+      // const data = await res.json()
+      // msgEl.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`
+      
+      // TODO: 请实现
+      
+      msgEl.innerHTML = '<span class="error">TODO: 请先实现前端的 TODO 任务</span>'
+    }
+
+    function getProfile() {
+      makeAuthRequest(`${API_BASE}/profile`)
+    }
+
+    function getSecret() {
+      makeAuthRequest(`${API_BASE}/secret`)
+    }
+
+    function getPublic() {
+      fetch(`${API_BASE}/public`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('apiMsg').innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`
+        })
+    }
+
+    // 页面加载时检查 token
+    window.onload = () => {
+      const token = getStoredToken()
+      if (token) {
+        currentToken = token
+        document.getElementById('tokenCard').classList.remove('hidden')
+        document.getElementById('tokenDisplay').textContent = token
+      }
+    }
+  </script>
+</body>
+</html>
