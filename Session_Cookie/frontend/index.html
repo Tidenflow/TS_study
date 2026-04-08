@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session + Cookie 学习</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    #app {
+      width: 100%;
+      max-width: 400px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #666;
+      font-size: 14px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4a90d9;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4a90d9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    button:hover {
+      background: #3a7fc8;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .secondary-btn {
+      background: #666;
+      margin-top: 12px;
+    }
+    .secondary-btn:hover {
+      background: #555;
+    }
+    .error {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .success {
+      color: #27ae60;
+      font-size: 14px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .user-info {
+      text-align: center;
+    }
+    .user-info h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    .info-item {
+      text-align: left;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      color: #999;
+      font-size: 12px;
+    }
+    .info-value {
+      color: #333;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="card">
+      <h1>Session + Cookie 学习</h1>
+      
+      <div v-if="!isLoggedIn">
+        <div class="form-group">
+          <label>用户名</label>
+          <input v-model="loginForm.username" placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input v-model="loginForm.password" type="password" placeholder="123456">
+        </div>
+        <button @click="handleLogin" :disabled="logging">
+          {{ logging ? '登录中...' : '登录' }}
+        </button>
+        <div v-if="error" class="error">{{ error }}</div>
+      </div>
+
+      <div v-else class="user-info">
+        <h2>欢迎, {{ userInfo.username }}</h2>
+        <div class="info-item">
+          <div class="info-label">User ID</div>
+          <div class="info-value">{{ userInfo.userId }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Role</div>
+          <div class="info-value">{{ userInfo.role }}</div>
+        </div>
+        <div class="info-item" v-if="userInfo.nickname">
+          <div class="info-label">Nickname</div>
+          <div class="info-value">{{ userInfo.nickname }}</div>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label>更新昵称</label>
+          <input v-model="nickname" placeholder="输入新昵称">
+        </div>
+        <button @click="updateProfile">更新资料</button>
+        <button @click="handleLogout" class="secondary-btn">登出</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import { createApp, ref, onMounted } from "vue"
+
+    createApp({
+      setup() {
+        const isLoggedIn = ref(false)
+        const logging = ref(false)
+        const error = ref("")
+        const success = ref("")
+        const nickname = ref("")
+        const loginForm = ref({
+          username: "",
+          password: ""
+        })
+        const userInfo = ref({
+          userId: "",
+          username: "",
+          role: "",
+          nickname: ""
+        })
+
+        const handleLogin = async () => {
+          error.value = ""
+          logging.value = true
+          
+          try {
+            const res = await fetch("/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(loginForm.value)
+            })
+            const data = await res.json()
+            
+            if (res.ok) {
+              isLoggedIn.value = true
+              userInfo.value.username = data.username
+              await fetchUserInfo()
+            } else {
+              error.value = data.error
+            }
+          } catch (e) {
+            error.value = "请求失败"
+          } finally {
+            logging.value = false
+          }
+        }
+
+        const fetchUserInfo = async () => {
+          try {
+            const res = await fetch("/me")
+            if (res.ok) {
+              const data = await res.json()
+              userInfo.value = data
+              isLoggedIn.value = true
+            }
+          } catch (e) {
+            isLoggedIn.value = false
+          }
+        }
+
+        const handleLogout = async () => {
+          try {
+            await fetch("/logout", { method: "POST" })
+            isLoggedIn.value = false
+            userInfo.value = { userId: "", username: "", role: "", nickname: "" }
+            loginForm.value = { username: "", password: "" }
+          } catch (e) {
+            error.value = "登出失败"
+          }
+        }
+
+        const updateProfile = async () => {
+          if (!nickname.value) return
+          
+          try {
+            const res = await fetch("/profile", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ nickname: nickname.value })
+            })
+            if (res.ok) {
+              userInfo.value.nickname = nickname.value
+              success.value = "更新成功"
+              setTimeout(() => success.value = "", 2000)
+            }
+          } catch (e) {
+            error.value = "更新失败"
+          }
+        }
+
+        onMounted(async () => {
+          await fetchUserInfo()
+        })
+
+        return {
+          isLoggedIn,
+          logging,
+          error,
+          success,
+          nickname,
+          loginForm,
+          userInfo,
+          handleLogin,
+          handleLogout,
+          updateProfile
+        }
+      }
+    }).mount("#app")
+  </script>
+</body>
+</html>
