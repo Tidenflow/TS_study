@@ -69,6 +69,11 @@
       // 参考答案：localStorage.setItem('token', token)
       
       // TODO: 请实现
+      // localStorage：浏览器里的永久存储
+      // setItem：存数据
+      // 'token'：key（名字）
+      // token：要存的值（JWT 字符串）
+      localStorage.setItem('token', token);
     }
 
     // ============================================
@@ -79,7 +84,7 @@
       // 参考答案：return localStorage.getItem('token')
       
       // TODO: 请实现
-      return null
+      return localStorage.getItem('token')
     }
 
     // ============================================
@@ -90,6 +95,7 @@
       // 参考答案：localStorage.removeItem('token')
       
       // TODO: 请实现
+      localStorage.removeItem('token')
     }
 
     // 登录
@@ -110,8 +116,37 @@
         // const data = await res.json()
         
         // TODO: 请实现完整的登录逻辑
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })  //把 JS 对象 → 变成 JSON 字符串
+        })
+        const data = await res.json();
+
+
+
+        // 少下面这部分
+        // 之前的代码只做到了只做到了：发请求 → 拿到 token → 就没了！
+        // 所以前端根本不知道你登录成功了，页面也不会显示 token，后面接口也调用不了。
+        //代码点击登录显示TODO: 请先实现前端的 TODO 任务
+        if (!res.ok) {
+        throw new Error(data.error || '登录失败')
+        }
+
+        // 1. 保存 token
+        saveToken(data.JWTtoken);
+         currentToken = data.JWTtoken;
+
+        // 2. 显示 token 到页面
+        document.getElementById('tokenCard').classList.remove('hidden');
+        document.getElementById('tokenDisplay').textContent = data.JWTtoken;
+
+        msgEl.innerHTML = '<span class="success">登录成功！</span>';
+        //就是缺上面这段
         
-        msgEl.innerHTML = '<span class="error">TODO: 请先实现前端的 TODO 任务</span>'
+
+
+        // msgEl.innerHTML = '<span class="error">TODO: 请先实现前端的 TODO 任务</span>'
       } catch (err) {
         msgEl.innerHTML = `<span class="error">错误: ${err.message}</span>`
       }
@@ -149,8 +184,20 @@
       // msgEl.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`
       
       // TODO: 请实现
+      const token = getStoredToken();
+      if (!token) {
+        msgEl.innerHTML = '<span class="error">请先登录</span>'
+        return
+      }
+      const res = await fetch(url, {
+        headers: {'Authorization': `Bearer ${token}`}
+      })
+      const data = await res.json();  //res.json() 是异步操作，必须加 await。这个.json函数是一个异步函数
+      msgEl.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`
       
-      msgEl.innerHTML = '<span class="error">TODO: 请先实现前端的 TODO 任务</span>'
+
+      
+      // msgEl.innerHTML = '<span class="error">TODO: 请先实现前端的 TODO 任务</span>'
     }
 
     function getProfile() {
