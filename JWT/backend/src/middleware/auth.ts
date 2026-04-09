@@ -44,6 +44,18 @@ export function authMiddleware(
   // }
   
   // TODO: 请实现
+  const authHeader = req.headers.authorization;
+  if(!authHeader) {
+    return res.status(401).json({error: "未提供令牌"});
+  }
+  const token = authHeader.replace("Bearer ", "");
+  try{
+    const decoded = verifyToken(token);  //decoded 就是你之前存在 token 里的【载荷 payload】
+    req.user = decoded;   //把解析出来的用户信息，挂到请求对象上，让后面的接口能用！
+    next();
+  } catch(err) {
+    return res.status(401).json({ error: "令牌无效或已过期" })
+  }
   
   next() // 临时通过，方便测试
 }

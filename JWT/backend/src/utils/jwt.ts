@@ -20,12 +20,21 @@ export function generateToken(payload: TokenPayload): string {
   // 参考答案：
   // return jwt.sign(payload, secret, { expiresIn: "7d" })
   
-  return "" // TODO: 请实现
+ // TODO: 请实现
+ return jwt.sign(
+  payload,  //第1部分要存在token里的信息（载荷）
+  secret,   // 第2部分：加密密钥（秘钥）
+  {
+    expiresIn: "7d",
+    algorithm: "HS256"  // ✅ 正确写法：algorithm  
+  }  //第3部分：配置选项（过期时间等）
+ )
 }
 
 // ============================================
 // TODO: 验证 JWT 令牌
 // ============================================
+// verifyToken = 验真 + 解密（安全、正式用）
 export function verifyToken(token: string): TokenPayload {
   // 任务：
   // 1. 使用 jwt.verify() 验证令牌
@@ -35,12 +44,14 @@ export function verifyToken(token: string): TokenPayload {
   // 参考答案：
   // return jwt.verify(token, secret) as TokenPayload
   
-  return {} as TokenPayload // TODO: 请实现
+  // TODO: 请实现
+  return jwt.verify(token, secret) as TokenPayload 
 }
 
 // ============================================
 // TODO: 解码 JWT（不验证，仅提取数据）
 // ============================================
+//  decodeToken = 只偷看、不验证（不安全、仅调试用）
 export function decodeToken(token: string): TokenPayload | null {
   // 任务：
   // 1. 使用 jwt.decode() 提取 payload
@@ -48,6 +59,9 @@ export function decodeToken(token: string): TokenPayload | null {
   
   // 参考答案：
   // return jwt.decode(token) as TokenPayload | null
-  
-  return null // TODO: 请实现
+  // TODO: 请实现
+  return jwt.decode(token) as TokenPayload | null 
 }
+
+
+

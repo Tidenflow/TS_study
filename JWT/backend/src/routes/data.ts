@@ -1,5 +1,6 @@
 import express from "express"
 import { authMiddleware } from "../middleware/auth"
+import { UserInfo } from "os"
 
 const router = express.Router()
 
@@ -20,8 +21,12 @@ router.get("/profile", authMiddleware, (req, res) => {
   // })
   
   // TODO: 请实现
-  
-  res.json({ message: "TODO: 请实现获取用户资料" })
+  const user = req.user
+  res.json({
+    id: user?.sub,
+    name: user?.name,
+    role: user?.role
+  });
 })
 
 // ============================================
@@ -33,11 +38,30 @@ router.get("/secret", authMiddleware, (req, res) => {
   // 2. 返回私密数据
   
   // TODO: 请实现
-  
-  res.json({ 
-    message: "TODO: 这是私密数据",
-    data: "只有登录用户才能看到"
-  })
+  const user = req.user;
+
+  // 加一行判断  要不下面user.role !== "admin"报错
+  if (!user) {
+    return res.status(401).json({ error: "用户未登录" });
+  }
+
+  // 可选：仅管理员可以访问此接口
+  if (user.role !== "admin") {
+    return res.status(403).json({
+      error: "权限不足，只有管理员才能访问"
+    });
+  }
+
+  // 返回私密数据
+  res.json({
+    message: "这是私密数据",
+    data: "只有登录的管理员才能看到",
+    user: {
+      id: user.sub,
+      name: user.name,
+      role: user.role
+    }
+  });
 })
 
 // 公开接口（无需登录）
