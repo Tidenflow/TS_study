@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Tester</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2e3147;
+      --text: #c9d1d9;
+      --muted: #6e7681;
+      --accent: #79c0ff;
+      --green: #56d364;
+      --red: #ff7b72;
+      --yellow: #e3b341;
+      --purple: #d2a8ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; padding: 24px; }
+
+    h1 { font-size: 1.4rem; margin-bottom: 20px; color: var(--accent); font-weight: 600; }
+
+    /* Auth bar */
+    #auth-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; }
+    #auth-bar h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
+    .auth-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .auth-row input { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 12px; font-size: 0.85rem; flex: 1; min-width: 160px; outline: none; }
+    .auth-row input:focus { border-color: var(--accent); }
+    #token-display { font-size: 0.8rem; color: var(--muted); margin-top: 8px; word-break: break-all; max-height: 60px; overflow-y: auto; }
+    #token-display span { color: var(--green); }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; margin-left: 8px; vertical-align: middle; }
+    .tag-admin { background: #2d1f4e; color: var(--purple); }
+    .tag-guest { background: #1f2d1f; color: var(--green); }
+
+    /* Section */
+    .section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .section-header { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; user-select: none; gap: 10px; }
+    .section-header:hover { background: rgba(255,255,255,0.03); }
+    .method { font-family: monospace; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; min-width: 56px; text-align: center; }
+    .method-GET { background: #1f3d1f; color: var(--green); }
+    .method-POST { background: #1f2e1f; color: var(--green); }
+    .method-DELETE { background: #3d1f1f; color: var(--red); }
+    .section-path { font-family: monospace; font-size: 0.85rem; color: var(--text); }
+    .section-arrow { margin-left: auto; color: var(--muted); transition: transform 0.2s; }
+    .section-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    .section-body.open { display: block; }
+    .section-header.open .section-arrow { transform: rotate(90deg); }
+
+    /* Form */
+    .form-group { margin-top: 12px; }
+    .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .form-group input, .form-group textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; outline: none; font-family: monospace; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+    .desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; margin-top: -4px; }
+    .btn { display: inline-block; padding: 8px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; margin-right: 8px; margin-top: 8px; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #0d1117; }
+    .btn-danger { background: var(--red); color: #fff; }
+
+    /* Response */
+    #response-area { margin-top: 20px; }
+    #response-area h3 { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    #response-meta { font-size: 0.78rem; margin-bottom: 6px; }
+    #response-meta .code { font-family: monospace; padding: 1px 6px; border-radius: 4px; font-weight: 700; }
+    #response-meta .code-2xx { background: #1f3d1f; color: var(--green); }
+    #response-meta .code-4xx { background: #3d2f1f; color: var(--yellow); }
+    #response-meta .code-5xx { background: #3d1f1f; color: var(--red); }
+    #response-time { color: var(--muted); }
+    #response-body { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.82rem; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; line-height: 1.6; color: var(--green); }
+    #response-body.error { color: var(--red); }
+
+    /* Products list */
+    #products-list { margin-top: 8px; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .product-item:last-child { border-bottom: none; }
+    .product-item .pname { font-weight: 600; }
+    .product-item .pprice { color: var(--accent); font-family: monospace; }
+    .product-item .pid { color: var(--muted); font-size: 0.8rem; margin-right: 8px; }
+
+    /* Loading */
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<h1>API Tester</h1>
+
+<!-- Auth bar -->
+<div id="auth-bar">
+  <h2>Token <span id="role-tag"></span></h2>
+  <div class="auth-row">
+    <input type="text" id="token-input" placeholder="粘贴 token 或登录后自动填入" />
+    <button class="btn btn-primary" onclick="authLogin()">登录</button>
+    <button class="btn btn-primary" onclick="authRegister()">注册</button>
+    <button class="btn btn-danger" onclick="clearToken()">清除</button>
+  </div>
+  <div id="token-display">未登录（Guest 权限）</div>
+</div>
+
+<!-- Health -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="method method-GET">GET</span>
+    <span class="section-path">/health</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p class="desc">健康检查接口，无需认证</p>
+    <button class="btn btn-primary" onclick="sendReq('GET', '/health', null, null)">发送请求</button>
+  </div>
+</div>
+
+<!-- Products -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="method method-GET">GET</span>
+    <span class="section-path">/api/products</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p class="desc">商品列表，支持分页（page, limit）和搜索（keyword）</p>
+    <div class="form-group">
+      <label>Query Params（如 page=1&limit=5）</label>
+      <input type="text" id="products-q" placeholder="page=1&limit=5" />
+    </div>
+    <button class="btn btn-primary" onclick="sendReq('GET', '/api/products', null, getQuery('products-q'))">发送请求</button>
+    <div id="products-list"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="method method-GET">GET</span>
+    <span class="section-path">/api/products/:id</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p class="desc">查看单个商品详情</p>
+    <div class="form-group">
+      <label>商品 ID</label>
+      <input type="number" id="product-id" placeholder="输入商品 ID，如 1" />
+    </div>
+    <button class="btn btn-primary" onclick="sendReq('GET', '/api/products/' + document.getElementById('product-id').value, null, null)">发送请求</button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="method method-POST">POST</span>
+    <span class="section-path">/api/products</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p class="desc">新增商品（需 admin 权限）</p>
+    <div class="form-group"><label>name *</label><input type="text" id="p-name" placeholder="商品名称" /></div>
+    <div class="form-group"><label>description</label><input type="text" id="p-desc" placeholder="商品描述" /></div>
+    <div class="form-group"><label>price *</label><input type="number" id="p-price" placeholder="价格，如 99.9" /></div>
+    <div class="form-group"><label>stock</label><input type="number" id="p-stock" placeholder="库存数量" /></div>
+    <div class="form-group"><label>imageUrl</label><input type="text" id="p-img" placeholder="图片 URL" /></div>
+    <button class="btn btn-primary" onclick="createProduct()">发送请求</button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="method method-DELETE">DELETE</span>
+    <span class="section-path">/api/products/:id</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p class="desc">删除商品（需 admin 权限）</p>
+    <div class="form-group"><label>商品 ID</label><input type="number" id="del-id" placeholder="输入商品 ID" /></div>
+    <button class="btn btn-danger" onclick="deleteProduct()">删除商品</button>
+  </div>
+</div>
+
+<!-- Response -->
+<div id="response-area">
+  <h3>Response</h3>
+  <div id="response-meta"></div>
+  <pre id="response-body">点击上方任意按钮发送请求，响应将显示在这里...</pre>
+</div>
+
+<script>
+  const BASE = 'http://localhost:3000';
+
+  function getToken() {
+    const t = document.getElementById('token-input').value.trim();
+    return t.startsWith('Bearer ') ? t : (t ? 'Bearer ' + t : '');
+  }
+
+  function toggleSection(el) {
+    el.classList.toggle('open');
+    el.nextElementSibling.classList.toggle('open');
+  }
+
+  function getQuery(inputId) {
+    const v = document.getElementById(inputId).value.trim();
+    return v ? '?' + v : '';
+  }
+
+  function buildHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    const t = getToken();
+    if (t) h['Authorization'] = t;
+    return h;
+  }
+
+  async function sendReq(method, path, body, query) {
+    const url = BASE + path + (query || '');
+    const meta = document.getElementById('response-meta');
+    const bodyEl = document.getElementById('response-body');
+    meta.innerHTML = '<span style="color:var(--muted)">loading...</span>';
+    bodyEl.textContent = '';
+    bodyEl.className = '';
+
+    const t0 = Date.now();
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: buildHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const elapsed = Date.now() - t0;
+      const text = await res.text();
+      let json = text;
+      try { json = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+      const code = res.status;
+      const codeClass = code < 300 ? 'code-2xx' : code < 500 ? 'code-4xx' : 'code-5xx';
+      meta.innerHTML = `<span class="code ${codeClass}">${code}</span> <span id="response-time">${elapsed}ms</span>`;
+      bodyEl.textContent = json;
+      bodyEl.className = code >= 400 ? 'error' : '';
+    } catch (err) {
+      const elapsed = Date.now() - t0;
+      meta.innerHTML = `<span class="code code-5xx">ERR</span> <span id="response-time">${elapsed}ms</span>`;
+      bodyEl.textContent = '请求失败：' + err.message + '\n\n请确保后端服务已启动（npm run dev）并运行在 localhost:3000';
+      bodyEl.className = 'error';
+    }
+  }
+
+  async function createProduct() {
+    const body = {};
+    const name = document.getElementById('p-name').value.trim();
+    const price = document.getElementById('p-price').value.trim();
+    if (!name || !price) { alert('name 和 price 为必填项'); return; }
+    body.name = name;
+    if (document.getElementById('p-desc').value.trim()) body.description = document.getElementById('p-desc').value.trim();
+    body.price = parseFloat(price);
+    if (document.getElementById('p-stock').value.trim()) body.stock = parseInt(document.getElementById('p-stock').value);
+    if (document.getElementById('p-img').value.trim()) body.imageUrl = document.getElementById('p-img').value.trim();
+    sendReq('POST', '/api/products', body, null);
+  }
+
+  async function deleteProduct() {
+    const id = document.getElementById('del-id').value.trim();
+    if (!id) { alert('请输入商品 ID'); return; }
+    if (!confirm('确认删除商品 #' + id + '？')) return;
+    sendReq('DELETE', '/api/products/' + id, null, null);
+  }
+
+  async function authLogin() {
+    const username = prompt('用户名:');
+    const password = prompt('密码:');
+    if (!username || !password) return;
+    const meta = document.getElementById('response-meta');
+    meta.innerHTML = '<span style="color:var(--muted)">登录中...</span>';
+    try {
+      const res = await fetch(BASE + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const json = await res.json();
+      meta.innerHTML = `<span class="code ${res.ok ? 'code-2xx' : 'code-4xx'}">${res.status}</span>`;
+      if (json.token) {
+        document.getElementById('token-input').value = json.token;
+        updateTokenDisplay(json.token);
+      }
+      document.getElementById('response-body').textContent = JSON.stringify(json, null, 2);
+      document.getElementById('response-body').className = res.ok ? '' : 'error';
+    } catch (err) {
+      document.getElementById('response-body').textContent = '请求失败：' + err.message;
+      document.getElementById('response-body').className = 'error';
+    }
+  }
+
+  async function authRegister() {
+    const username = prompt('用户名:');
+    const password = prompt('密码:');
+    const name = prompt('姓名（显示名）:');
+    if (!username || !password || !name) return;
+    const meta = document.getElementById('response-meta');
+    meta.innerHTML = '<span style="color:var(--muted)">注册中...</span>';
+    try {
+      const res = await fetch(BASE + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, name }),
+      });
+      const json = await res.json();
+      meta.innerHTML = `<span class="code ${res.ok ? 'code-2xx' : 'code-4xx'}">${res.status}</span>`;
+      document.getElementById('response-body').textContent = JSON.stringify(json, null, 2);
+      document.getElementById('response-body').className = res.ok ? '' : 'error';
+    } catch (err) {
+      document.getElementById('response-body').textContent = '请求失败：' + err.message;
+      document.getElementById('response-body').className = 'error';
+    }
+  }
+
+  function clearToken() {
+    document.getElementById('token-input').value = '';
+    updateTokenDisplay(null);
+  }
+
+  function updateTokenDisplay(token) {
+    const el = document.getElementById('token-display');
+    const roleTag = document.getElementById('role-tag');
+    if (!token) {
+      el.innerHTML = '未登录（Guest 权限）';
+      roleTag.innerHTML = '';
+      return;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role = payload.role || 'unknown';
+      const roleClass = role === 'admin' ? 'tag-admin' : 'tag-guest';
+      const roleText = role === 'admin' ? 'Admin' : 'User';
+      el.innerHTML = `Token 已设置 <span>✓</span> &nbsp;|&nbsp; role: <span>${role}</span>`;
+      roleTag.innerHTML = `<span class="tag ${roleClass}">${roleText}</span>`;
+    } catch {
+      el.innerHTML = 'Token 已设置 <span>✓</span>';
+      roleTag.innerHTML = '';
+    }
+  }
+
+  // Auto-load token from localStorage
+  (function() {
+    const saved = localStorage.getItem('api_tester_token');
+    if (saved) {
+      document.getElementById('token-input').value = saved;
+      updateTokenDisplay(saved);
+    }
+    // Auto-save token on change
+    document.getElementById('token-input').addEventListener('input', function() {
+      const t = this.value.trim();
+      if (t) localStorage.setItem('api_tester_token', t);
+      else localStorage.removeItem('api_tester_token');
+      updateTokenDisplay(t);
+    });
+  })();
+</script>
+
+</body>
+</html>
