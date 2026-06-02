@@ -51,14 +51,16 @@
     /* Form */
     .form-group { margin-top: 12px; }
     .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
-    .form-group input, .form-group textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; outline: none; font-family: monospace; }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; outline: none; font-family: monospace; }
+    .form-group select { cursor: pointer; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
     .form-group textarea { resize: vertical; min-height: 70px; }
     .desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; margin-top: -4px; }
     .btn { display: inline-block; padding: 8px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; margin-right: 8px; margin-top: 8px; transition: opacity 0.15s; }
     .btn:hover { opacity: 0.85; }
     .btn-primary { background: var(--accent); color: #0d1117; }
     .btn-danger { background: var(--red); color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* Response */
     #response-area { margin-top: 20px; }
@@ -73,15 +75,45 @@
     #response-body.error { color: var(--red); }
 
     /* Products list */
-    #products-list { margin-top: 8px; }
     .product-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
     .product-item:last-child { border-bottom: none; }
     .product-item .pname { font-weight: 600; }
     .product-item .pprice { color: var(--accent); font-family: monospace; }
     .product-item .pid { color: var(--muted); font-size: 0.8rem; margin-right: 8px; }
 
-    /* Loading */
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* ---- Load Test ---- */
+    #load-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+    #load-section-header { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; user-select: none; gap: 10px; }
+    #load-section-header:hover { background: rgba(255,255,255,0.03); }
+    #load-section-header .arrow { margin-left: auto; color: var(--muted); transition: transform 0.2s; }
+    #load-section-header.open .arrow { transform: rotate(90deg); }
+    #load-section-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    #load-section-body.open { display: block; }
+    .load-config { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .load-config select, .load-config input[type=number] { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; outline: none; font-family: monospace; width: 100%; cursor: pointer; }
+    .load-config select:focus, .load-config input[type=number]:focus { border-color: var(--accent); }
+    .load-controls { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    .load-progress-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; height: 22px; overflow: hidden; margin-top: 12px; }
+    .load-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.08s linear; border-radius: 6px; }
+    .load-progress-bar.done { background: var(--green); }
+    .load-progress-bar.err { background: var(--red); }
+    .load-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+    .load-stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; text-align: center; }
+    .load-stat-card .v { font-size: 1.5rem; font-weight: 700; font-family: monospace; color: var(--accent); line-height: 1; }
+    .load-stat-card .v.err { color: var(--red); }
+    .load-stat-card .v.ok { color: var(--green); }
+    .load-stat-card .l { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+    .load-latency { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+    .load-latency-item { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 7px 6px; text-align: center; }
+    .load-latency-item .lv { font-size: 0.92rem; font-weight: 700; font-family: monospace; color: var(--text); }
+    .load-latency-item .lk { font-size: 0.67rem; color: var(--muted); margin-top: 2px; }
+    .load-hist-wrap { margin-top: 10px; }
+    .load-hist-wrap .hist-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+    .load-hist { display: flex; align-items: flex-end; gap: 2px; height: 50px; }
+    .load-hist .bar { flex: 1; background: var(--accent); border-radius: 2px 2px 0 0; min-width: 2px; transition: height 0.1s; }
+    .load-hist .bar.bad { background: var(--red); }
+    .load-qps-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+    .load-qps-row .qps { font-family: monospace; font-weight: 700; color: var(--accent); }
   </style>
 </head>
 <body>
@@ -99,6 +131,228 @@
   </div>
   <div id="token-display">未登录（Guest 权限）</div>
 </div>
+
+<!-- Load Test Section -->
+<div id="load-section">
+  <div id="load-section-header" onclick="toggleLoadSection()">
+    <span class="method" style="background:#2a1f4e;color:#d2a8ff;">LOAD</span>
+    <span class="section-path">并发压测</span>
+    <span class="section-arrow"><span class="arrow">&#9658;</span></span>
+  </div>
+  <div id="load-section-body" class="open">
+    <p class="desc" style="margin-top:12px;">选择接口、方法、并发数，然后运行。Token 认证自动复用上方的 token。</p>
+    <div class="load-config">
+      <div class="form-group">
+        <label>接口</label>
+        <select id="lt-endpoint">
+          <option value="/api/products">GET  /api/products</option>
+          <option value="/api/products">POST /api/products</option>
+          <option value="/api/products">DELETE /api/products/:id</option>
+          <option value="/health">GET  /health</option>
+          <option value="/api/products/1">GET  /api/products/:id</option>
+          <option value="/api/auth/login">POST /api/auth/login</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>方法</label>
+        <select id="lt-method">
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>并发数 (concurrency)</label>
+        <input type="number" id="lt-concurrency" value="50" min="1" max="1000" placeholder="1~1000" />
+      </div>
+      <div class="form-group">
+        <label>总请求数 (total)</label>
+        <input type="number" id="lt-total" value="500" min="1" placeholder="请求总数" />
+    </div>
+
+    <div class="load-controls">
+      <button class="btn btn-primary" id="lt-start-btn" onclick="loadTestStart()">开始压测</button>
+      <button class="btn btn-danger" id="lt-stop-btn" onclick="loadTestStop()" disabled>停止</button>
+    </div>
+
+    <div class="load-progress-wrap">
+      <div class="load-progress-bar" id="lt-progress-bar"></div>
+    </div>
+    <div class="progress-text" id="lt-progress-text" style="margin-top:4px;text-align:center;font-size:0.78rem;color:var(--muted);"></div>
+
+    <!-- Results -->
+    <div id="lt-results" style="display:none;margin-top:16px;">
+      <div class="load-stats">
+        <div class="load-stat-card">
+          <div class="v ok" id="lt-success">-</div>
+          <div class="l">成功</div>
+        </div>
+        <div class="load-stat-card">
+          <div class="v err" id="lt-fail">-</div>
+          <div class="l">失败</div>
+        </div>
+        <div class="load-stat-card">
+          <div class="v" id="lt-qps">-</div>
+          <div class="l">QPS</div>
+        </div>
+        <div class="load-stat-card">
+          <div class="v" id="lt-total-time">-</div>
+          <div class="l">总耗时(s)</div>
+        </div>
+      </div>
+      <div class="load-latency">
+        <div class="load-latency-item">
+          <div class="lv" id="lt-min">-</div>
+          <div class="lk">最小ms</div>
+        </div>
+        <div class="load-latency-item">
+          <div class="lv" id="lt-p50">-</div>
+          <div class="lk">P50 ms</div>
+        </div>
+        <div class="load-latency-item">
+          <div class="lv" id="lt-p95">-</div>
+          <div class="lk">P95 ms</div>
+        </div>
+        <div class="load-latency-item">
+          <div class="lv" id="lt-p99">-</div>
+          <div class="lk">P99 ms</div>
+        </div>
+        <div class="load-latency-item">
+          <div class="lv" id="lt-max">-</div>
+          <div class="lk">最大ms</div>
+        </div>
+      </div>
+      <div class="load-hist-wrap">
+        <div class="load-hist" id="lt-hist"></div>
+        <div class="hist-labels">
+          <span>最快</span>
+          <span>响应时间分布（红色 &gt; P95）</span>
+          <span>最慢</span>
+        </div>
+      </div>
+      <div class="load-qps-row">
+        <span>请求耗时瀑布</span>
+        <span class="qps" id="lt-avg-ms">平均: -ms</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cache Scenario Section -->
+<div id="scenario-section" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+  <div style="display:flex;align-items:center;padding:12px 16px;cursor:pointer;gap:10px;" onclick="document.getElementById('scenario-body').classList.toggle('open'); this.classList.toggle('open');">
+    <span style="font-family:monospace;font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:4px;min-width:56px;text-align:center;background:#1f2a3d;color:#79c0ff;">CACHE</span>
+    <span style="font-family:monospace;font-size:0.85rem;color:var(--text);">缓存实验台</span>
+    <span id="scenario-active-badge" style="margin-left:auto;font-size:0.72rem;padding:2px 8px;border-radius:12px;background:#1f2d1f;color:#56d364;font-weight:600;">缓存开 · Normal</span>
+    <span style="color:var(--muted);transition:transform 0.2s;" class="sc-arrow">&#9658;</span>
+  </div>
+  <div id="scenario-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">
+
+    <!-- Step 1: Cache Enable Toggle -->
+    <div style="margin-top:14px;margin-bottom:12px;">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Step 1 · 缓存总开关</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer;">
+          <input type="checkbox" id="cache-enabled-toggle" checked onchange="toggleCacheEnabled(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
+          <span id="cache-toggle-track" style="position:absolute;inset:0;border-radius:13px;background:#2e3147;transition:background 0.2s;"></span>
+          <span id="cache-toggle-thumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#6e7681;transition:transform 0.2s,background 0.2s;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:11px;color:#fff;line-height:1;">✕</span>
+          </span>
+        </label>
+        <span id="cache-enabled-label" style="font-size:0.85rem;font-weight:600;color:#56d364;">缓存已启用</span>
+      </div>
+      <p class="desc" style="margin-top:6px;">关闭后所有请求直击 DB，无缓存层。</p>
+    </div>
+
+    <!-- Step 2: Cache Mode -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Step 2 · 缓存模式</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="sc-mode-btn active" data-mode="normal" onclick="setCacheMode('normal')" id="btn-mode-normal">Normal</button>
+        <button class="sc-mode-btn" data-mode="penetration" onclick="setCacheMode('penetration')" id="btn-mode-penetration">穿透</button>
+        <button class="sc-mode-btn" data-mode="breakdown" onclick="setCacheMode('breakdown')" id="btn-mode-breakdown">击穿</button>
+        <button class="sc-mode-btn" data-mode="avalanche" onclick="setCacheMode('avalanche')" id="btn-mode-avalanche">雪崩</button>
+      </div>
+      <div id="mode-desc" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:0.78rem;color:var(--muted);line-height:1.6;">
+        <span style="color:#56d364;">Normal</span> — 缓存正常工作，命中则直接返回，未命中则查 DB 并写入缓存。
+      </div>
+    </div>
+
+    <!-- Step 3: Warmup -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Step 3 · 预热（击穿/雪崩场景需要）</div>
+      <button class="btn btn-primary" onclick="scenarioAction('warmup')" id="sc-btn-warmup">预热缓存（请求商品 1~20）</button>
+    </div>
+
+    <!-- Experiment Matrix -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">组合实验矩阵</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:0.75rem;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;">
+          <div style="color:#56d364;font-weight:600;">✅ 缓存开 + Normal</div>
+          <div style="color:var(--muted);margin-top:2px;">观察缓存命中，快响应</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;">
+          <div style="color:#ff7b72;font-weight:600;">🔴 缓存开 + 穿透</div>
+          <div style="color:var(--muted);margin-top:2px;">清空缓存，全部打 DB</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;">
+          <div style="color:#ff7b72;font-weight:600;">⚡ 缓存开 + 击穿</div>
+          <div style="color:var(--muted);margin-top:2px;">删热点 key，并发同时打 DB</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;">
+          <div style="color:#ff7b72;font-weight:600;">💥 缓存开 + 雪崩</div>
+          <div style="color:var(--muted);margin-top:2px;">缓存离线，全部穿透 DB</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid #2e3147;border-radius:6px;padding:8px;grid-column:span 2;">
+          <div style="color:#e3b341;font-weight:600;">🚫 缓存关闭（任意模式）</div>
+          <div style="color:var(--muted);margin-top:2px;">无缓存层，所有请求直击 DB，观察无缓存时的基线响应时间</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-family:monospace;font-size:0.78rem;white-space:pre-wrap;word-break:break-all;color:var(--green);min-height:70px;max-height:140px;overflow-y:auto;" id="scenario-log">点击"预热缓存"开始实验...</div>
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;">
+        <div style="font-size:1.2rem;font-weight:700;color:var(--accent);font-family:monospace;" id="sc-total">-</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">总请求</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;">
+        <div style="font-size:1.2rem;font-weight:700;color:#56d364;font-family:monospace;" id="sc-hits">-</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">缓存命中</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;">
+        <div style="font-size:1.2rem;font-weight:700;color:#e3b341;font-family:monospace;" id="sc-misses">-</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">缓存未命中</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;">
+        <div style="font-size:1.2rem;font-weight:700;color:#ff7b72;font-family:monospace;" id="sc-db">-</div>
+        <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">DB穿透次数</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.sc-mode-btn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.sc-mode-btn:hover { border-color: var(--accent); color: var(--text); }
+.sc-mode-btn.active { background: #1f3d1f; border-color: #56d364; color: #56d364; }
+.sc-mode-btn.danger { background: #3d1f1f; border-color: #ff7b72; color: #ff7b72; }
+.sc-mode-btn.danger.active { background: #3d1f1f; border-color: #ff7b72; color: #ff7b72; }
+</style>
 
 <!-- Health -->
 <div class="section">
@@ -127,7 +381,6 @@
       <input type="text" id="products-q" placeholder="page=1&limit=5" />
     </div>
     <button class="btn btn-primary" onclick="sendReq('GET', '/api/products', null, getQuery('products-q'))">发送请求</button>
-    <div id="products-list"></div>
   </div>
 </div>
 
@@ -187,6 +440,25 @@
 <script>
   const BASE = 'http://localhost:3000';
 
+  // --- Load Test state ---
+  let ltRunning = false;
+  let ltStop = false;
+  let ltResults = null;
+
+  function toggleLoadSection() {
+    const h = document.getElementById('load-section-header');
+    const b = document.getElementById('load-section-body');
+    h.classList.toggle('open');
+    b.classList.toggle('open');
+  }
+
+  function buildHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    const t = getToken();
+    if (t) h['Authorization'] = t;
+    return h;
+  }
+
   function getToken() {
     const t = document.getElementById('token-input').value.trim();
     return t.startsWith('Bearer ') ? t : (t ? 'Bearer ' + t : '');
@@ -200,13 +472,6 @@
   function getQuery(inputId) {
     const v = document.getElementById(inputId).value.trim();
     return v ? '?' + v : '';
-  }
-
-  function buildHeaders() {
-    const h = { 'Content-Type': 'application/json' };
-    const t = getToken();
-    if (t) h['Authorization'] = t;
-    return h;
   }
 
   async function sendReq(method, path, body, query) {
@@ -234,8 +499,7 @@
       bodyEl.textContent = json;
       bodyEl.className = code >= 400 ? 'error' : '';
     } catch (err) {
-      const elapsed = Date.now() - t0;
-      meta.innerHTML = `<span class="code code-5xx">ERR</span> <span id="response-time">${elapsed}ms</span>`;
+      meta.innerHTML = `<span class="code code-5xx">ERR</span> <span id="response-time">${Date.now() - t0}ms</span>`;
       bodyEl.textContent = '请求失败：' + err.message + '\n\n请确保后端服务已启动（npm run dev）并运行在 localhost:3000';
       bodyEl.className = 'error';
     }
@@ -328,22 +592,20 @@
       const role = payload.role || 'unknown';
       const roleClass = role === 'admin' ? 'tag-admin' : 'tag-guest';
       const roleText = role === 'admin' ? 'Admin' : 'User';
-      el.innerHTML = `Token 已设置 <span>✓</span> &nbsp;|&nbsp; role: <span>${role}</span>`;
+      el.innerHTML = `Token 已设置 <span>&#10003;</span> &nbsp;|&nbsp; role: <span>${role}</span>`;
       roleTag.innerHTML = `<span class="tag ${roleClass}">${roleText}</span>`;
     } catch {
-      el.innerHTML = 'Token 已设置 <span>✓</span>';
+      el.innerHTML = 'Token 已设置 <span>&#10003;</span>';
       roleTag.innerHTML = '';
     }
   }
 
-  // Auto-load token from localStorage
   (function() {
     const saved = localStorage.getItem('api_tester_token');
     if (saved) {
       document.getElementById('token-input').value = saved;
       updateTokenDisplay(saved);
     }
-    // Auto-save token on change
     document.getElementById('token-input').addEventListener('input', function() {
       const t = this.value.trim();
       if (t) localStorage.setItem('api_tester_token', t);
@@ -351,6 +613,322 @@
       updateTokenDisplay(t);
     });
   })();
+
+  // Sync method dropdown with endpoint selection
+  document.getElementById('lt-endpoint').addEventListener('change', function() {
+    const methodSel = document.getElementById('lt-method');
+    const val = this.value;
+    if (val.includes('auth/login')) {
+      methodSel.value = 'POST';
+    } else if (val.includes('products') && !val.includes(':id')) {
+      // default stays
+    } else if (val.includes(':id') && !this.options[this.selectedIndex].text.startsWith('POST')) {
+      // single item endpoints are GET by default
+    }
+  });
+
+  // ---- Load Test Core ----
+  async function ltDoRequest(method, url, body) {
+    const t0 = Date.now();
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: buildHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      return { ok: res.ok, status: res.status, time: Date.now() - t0 };
+    } catch {
+      return { ok: false, status: 0, time: Date.now() - t0 };
+    }
+  }
+
+  function ltBuildBody(method, endpoint) {
+    if (method === 'POST' && endpoint === '/api/products') {
+      return {
+        name: `LoadTest-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        price: Math.round(Math.random() * 1000),
+        stock: Math.floor(Math.random() * 100),
+        description: '压测数据',
+      };
+    }
+    if (method === 'POST' && endpoint === '/api/auth/login') {
+      return { username: 'admin', password: 'admin123' };
+    }
+    return null;
+  }
+
+  function ltBuildUrl(method, endpoint) {
+    if (method === 'DELETE') {
+      // 假设删除 id 1~N
+      return BASE + endpoint + '/999'; // dummy id
+    }
+    return BASE + endpoint;
+  }
+
+  async function loadTestStart() {
+    if (ltRunning) return;
+
+    const method = document.getElementById('lt-method').value;
+    const endpoint = document.getElementById('lt-endpoint').value;
+    const concurrency = parseInt(document.getElementById('lt-concurrency').value);
+    const total = parseInt(document.getElementById('lt-total').value);
+
+    ltRunning = true;
+    ltStop = false;
+    document.getElementById('lt-start-btn').disabled = true;
+    document.getElementById('lt-stop-btn').disabled = false;
+    document.getElementById('lt-results').style.display = 'none';
+
+    const progressBar = document.getElementById('lt-progress-bar');
+    const progressText = document.getElementById('lt-progress-text');
+    progressBar.style.width = '0%';
+    progressBar.className = 'load-progress-bar';
+
+    const times = [];
+    let completed = 0;
+    let success = 0;
+    let fail = 0;
+    const t0 = Date.now();
+
+    // Worker pool: each worker picks tasks from a queue
+    const queue = Array.from({ length: total }, (_, i) => i);
+    let queueIdx = 0;
+    const lock = (fn) => fn(); // no-op since JS is single-threaded, but keeps structure clean
+
+    function nextId() {
+      if (queueIdx >= total) return null;
+      return queueIdx++;
+    }
+
+    async function worker() {
+      while (true) {
+        if (ltStop) return;
+        const id = nextId();
+        if (id === null) return;
+
+        const body = ltBuildBody(method, endpoint);
+        const url = ltBuildUrl(method, endpoint);
+        const result = await ltDoRequest(method, url, body);
+
+        times.push(result.time);
+        completed++;
+        if (result.ok) success++;
+        else fail++;
+
+        const pct = (completed / total * 100).toFixed(1);
+        progressBar.style.width = pct + '%';
+        progressText.textContent = `进行中 ${completed}/${total}  |  成功: ${success}  失败: ${fail}  耗时: ${result.time}ms`;
+      }
+    }
+
+    // Launch N concurrent workers
+    const workers = [];
+    for (let i = 0; i < concurrency; i++) {
+      workers.push(worker());
+    }
+
+    await Promise.all(workers);
+
+    ltRunning = false;
+    ltStop = false;
+    document.getElementById('lt-start-btn').disabled = false;
+    document.getElementById('lt-stop-btn').disabled = true;
+
+    const totalTime = (Date.now() - t0) / 1000;
+    const pct = 100;
+    progressBar.style.width = '100%';
+    progressBar.className = 'load-progress-bar done';
+    progressText.textContent = `完成!  ${completed}/${total}  |  成功: ${success}  失败: ${fail}  总耗时: ${totalTime.toFixed(2)}s`;
+
+    // Stats
+    const sorted = [...times].sort((a, b) => a - b);
+    const avg = (sorted.reduce((a, b) => a + b, 0) / sorted.length).toFixed(1);
+    const min = sorted[0];
+    const p50 = sorted[Math.floor(sorted.length * 0.50)];
+    const p95 = sorted[Math.floor(sorted.length * 0.95)];
+    const p99 = sorted[Math.floor(sorted.length * 0.99)];
+    const max = sorted[sorted.length - 1];
+    const qps = (total / totalTime).toFixed(1);
+
+    document.getElementById('lt-success').textContent = success;
+    document.getElementById('lt-fail').textContent = fail;
+    document.getElementById('lt-qps').textContent = qps;
+    document.getElementById('lt-total-time').textContent = totalTime.toFixed(2);
+    document.getElementById('lt-min').textContent = min;
+    document.getElementById('lt-p50').textContent = p50;
+    document.getElementById('lt-p95').textContent = p95;
+    document.getElementById('lt-p99').textContent = p99;
+    document.getElementById('lt-max').textContent = max;
+    document.getElementById('lt-avg-ms').textContent = '平均: ' + avg + 'ms';
+
+    // Histogram (20 buckets)
+    const buckets = 20;
+    const bucketSize = (max - min) / buckets || 1;
+    const bucketCounts = new Array(buckets).fill(0);
+    const bucketBad = new Array(buckets).fill(false);
+    times.forEach(t => {
+      const idx = Math.min(Math.floor((t - min) / bucketSize), buckets - 1);
+      bucketCounts[idx]++;
+    });
+    // Mark buckets above P95 as bad
+    const p95Val = p95;
+    for (let i = 0; i < buckets; i++) {
+      const bucketStart = min + i * bucketSize;
+      const bucketEnd = bucketStart + bucketSize;
+      if (bucketStart >= p95Val) bucketBad[i] = true;
+    }
+    const maxBucket = Math.max(...bucketCounts);
+
+    const histEl = document.getElementById('lt-hist');
+    histEl.innerHTML = '';
+    bucketCounts.forEach((count, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'bar' + (bucketBad[i] ? ' bad' : '');
+      bar.style.height = maxBucket > 0 ? (count / maxBucket * 100) + '%' : '0%';
+      bar.title = `${(min + i * bucketSize).toFixed(0)}-${(min + (i + 1) * bucketSize).toFixed(0)}ms: ${count}`;
+      histEl.appendChild(bar);
+    });
+
+    document.getElementById('lt-results').style.display = 'block';
+  }
+
+  function loadTestStop() {
+    ltStop = true;
+    document.getElementById('lt-progress-text').textContent += '  [已停止]';
+    document.getElementById('lt-progress-bar').className = 'load-progress-bar err';
+  }
+
+  // ---- Cache Scenario ----
+  const MODE_DESC = {
+    normal:     '<span style="color:#56d364;">Normal</span> — 缓存正常工作，命中则直接返回，未命中则查 DB 并写入缓存。',
+    penetration: '<span style="color:#ff7b72;">穿透</span> — 清空所有缓存，请求全部直接穿透到 DB（绕过缓存）。适用于模拟恶意/异常查询打穿缓存层。',
+    breakdown:  '<span style="color:#e3b341;">击穿</span> — 删除热点 key（先预热），并发请求将同时穿透到 DB。适用于模拟热点数据过期瞬间的冲击。',
+    avalanche:  '<span style="color:#d2a8ff;">雪崩</span> — 模拟缓存宕机（离线），所有缓存 GET 返回 null，全部请求穿透 DB。适用于模拟 Redis 崩溃场景。',
+  };
+
+  function updateBadge() {
+    const badge = document.getElementById('scenario-active-badge');
+    const toggle = document.getElementById('cache-enabled-toggle');
+    const enabled = toggle.checked;
+    badge.textContent = enabled ? '缓存开 · Normal' : '缓存关 · 直击DB';
+    badge.style.background = enabled ? '#1f2d1f' : '#3d2d1f';
+    badge.style.color = enabled ? '#56d364' : '#e3b341';
+  }
+
+  async function toggleCacheEnabled(enabled) {
+    const track = document.getElementById('cache-toggle-track');
+    const thumb = document.getElementById('cache-toggle-thumb');
+    const label = document.getElementById('cache-enabled-label');
+
+    track.style.background = enabled ? '#1f3d1f' : '#3d1f1f';
+    thumb.style.transform = enabled ? 'translateX(22px)' : 'translateX(0)';
+    thumb.style.background = enabled ? '#56d364' : '#ff7b72';
+    thumb.querySelector('span').textContent = enabled ? '✓' : '✕';
+    label.textContent = enabled ? '缓存已启用' : '缓存已禁用';
+    label.style.color = enabled ? '#56d364' : '#ff7b72';
+
+    const res = await fetch(BASE + '/api/scenario/enable', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled }),
+    });
+    const j = await res.json();
+    updateBadge();
+    updateStats(j.stats);
+    log(`[缓存开关] ${enabled ? '✅ 已启用' : '🚫 已禁用'} — ${j.message || ''}`, enabled ? '#56d364' : '#ff7b72');
+  }
+
+  function setModeButtons(mode) {
+    const modes = ['normal', 'penetration', 'breakdown', 'avalanche'];
+    modes.forEach(m => {
+      const btn = document.getElementById('btn-mode-' + m);
+      if (!btn) return;
+      const isActive = m === mode;
+      const isDanger = m !== 'normal';
+      btn.classList.toggle('active', isActive);
+      btn.classList.toggle('danger', isActive && isDanger);
+    });
+    document.getElementById('mode-desc').innerHTML = MODE_DESC[mode] || MODE_DESC.normal;
+
+    const badge = document.getElementById('scenario-active-badge');
+    const names = { normal: 'Normal', penetration: '穿透', breakdown: '击穿', avalanche: '雪崩' };
+    badge.textContent = '缓存开 · ' + (names[mode] || mode);
+    badge.style.background = '#3d1f1f';
+    badge.style.color = '#ff7b72';
+  }
+
+  async function setCacheMode(mode) {
+    setModeButtons(mode);
+    const res = await fetch(BASE + '/api/scenario/mode', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode }),
+    });
+    const j = await res.json();
+    updateStats(j.stats);
+    log(`[模式切换] ${j.message || mode}`, '#ff7b72');
+  }
+
+  function updateStats(stats) {
+    if (!stats) return;
+    document.getElementById('sc-total').textContent = stats.totalRequests ?? '-';
+    document.getElementById('sc-hits').textContent = stats.cacheHits ?? '-';
+    document.getElementById('sc-misses').textContent = stats.cacheMisses ?? '-';
+    document.getElementById('sc-db').textContent = stats.dbHits ?? '-';
+  }
+
+  function log(msg, color = '#56d364') {
+    const el = document.getElementById('scenario-log');
+    const ts = new Date().toLocaleTimeString();
+    el.innerHTML += `\n[${ts}] ${msg}`;
+    el.style.color = color;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  async function scenarioAction(action) {
+    switch (action) {
+      case 'warmup': {
+        log('预热中... 请求商品 ID 1~20，建立 Redis 缓存...', '#79c0ff');
+        const res = await fetch(BASE + '/api/scenario/warmup', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ startId: 1, endId: 20 }),
+        });
+        const j = await res.json();
+        log(`预热完成: ${j.message}`, '#56d364');
+        break;
+      }
+      case 'stats': {
+        const res = await fetch(BASE + '/api/scenario');
+        const j = await res.json();
+        updateStats(j.stats);
+        break;
+      }
+    }
+  }
+
+  // Init: fetch current state
+  (async function initScenario() {
+    try {
+      const res = await fetch(BASE + '/api/scenario');
+      const j = await res.json();
+      document.getElementById('cache-enabled-toggle').checked = j.enabled;
+      setModeButtons(j.mode);
+      updateStats(j.stats);
+      updateBadge();
+      toggleCacheEnabled(j.enabled);
+      log(`当前状态: 缓存${j.enabled ? '开' : '关'} · ${j.mode}`, '#56d364');
+    } catch {
+      log('无法连接后端，请确保服务已启动', '#ff7b72');
+    }
+  })();
+
+  // Auto-refresh stats every 3s when section is open
+  setInterval(async () => {
+    if (!document.getElementById('scenario-body')?.classList.contains('open')) return;
+    try {
+      const res = await fetch(BASE + '/api/scenario');
+      const j = await res.json();
+      updateStats(j.stats);
+    } catch {}
+  }, 3000);
 </script>
 
 </body>

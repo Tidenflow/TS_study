@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Product } from '../entity/Product';
 import { authMiddleware, adminMiddleware } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
+import { cacheGet, cacheSet, cacheDel, recordDbHit } from '../utils/cache';
 
 const router = Router();
 const productRepo = AppDataSource.getRepository(Product);
@@ -29,9 +30,27 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 // GET /api/products/:id  商品详情
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product = await productRepo.findOneBy({ id: Number(req.params.id) });
+    const id = Number(req.params.id);
+    if (isNaN(id)) throw new AppError('无效的商品 ID', 400);
+
+    const cacheKey = `product:${id}`;
+
+    // Cache-Aside: 先查缓存
+    const { hit, value } = await cacheGet(cacheKey);
+
+    if (hit && value) {
+      return res.json({ ...JSON.parse(value), _from: 'cache' });
+    }
+
+    // 缓存未命中，查 DB
+    const product = await productRepo.findOneBy({ id });
     if (!product) throw new AppError('商品不存在', 404);
-    res.json(product);
+
+    // 写入缓存，TTL 5 分钟
+    await cacheSet(cacheKey, JSON.stringify(product), 300);
+    await recordDbHit();
+
+    res.json({ ...product, _from: 'db' });
   } catch (err) {
     next(err);
   }
